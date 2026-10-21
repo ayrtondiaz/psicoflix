@@ -1,0 +1,629 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PsicoFlix · ¿La IA piensa por mí?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #141414;
+    --bg-2: #1f1f1f;
+    --bg-3: #2a2a2a;
+    --text: #ffffff;
+    --muted: #b3b3b3;
+    --red: #e50914;
+    --green: #46d369;
+    --yellow: #f5c518;
+    --radius: 6px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: "Inter", system-ui, sans-serif; line-height: 1.5; overflow-x: hidden; }
+  h1, h2, h3, .logo { font-family: "Bebas Neue", "Inter", sans-serif; letter-spacing: .5px; font-weight: 400; }
+  button { font: inherit; cursor: pointer; border: 0; }
+
+  /* NAV */
+  nav { position: fixed; inset: 0 0 auto 0; z-index: 50; display: flex; align-items: center; gap: 28px; padding: 14px 4%; background: linear-gradient(#000c, transparent); transition: background .3s; }
+  nav.solid { background: var(--bg); }
+  .logo { color: var(--red); font-size: 2.1rem; }
+  nav a { color: #e5e5e5; text-decoration: none; font-size: .9rem; }
+  nav a:hover { color: var(--muted); }
+  .nav-links { display: flex; gap: 20px; flex-wrap: wrap; }
+  @media (max-width: 720px) { .nav-links { display: none; } }
+
+  /* HERO */
+  .hero { min-height: 92vh; display: flex; align-items: center; padding: 120px 4% 60px;
+    background:
+      radial-gradient(ellipse at 75% 40%, #e5091455 0%, transparent 55%),
+      radial-gradient(ellipse at 90% 80%, #4b1fa855 0%, transparent 50%),
+      linear-gradient(to top, var(--bg) 0%, transparent 30%), #0b0b0b; position: relative; }
+  .hero-inner { max-width: 640px; position: relative; z-index: 2; }
+  .badge { display: inline-flex; align-items: center; gap: 8px; font-weight: 800; color: var(--muted); letter-spacing: 3px; font-size: .8rem; }
+  .badge b { color: var(--red); font-family: "Bebas Neue"; font-size: 1.6rem; letter-spacing: 0; }
+  .hero h1 { font-size: clamp(3rem, 9vw, 6.5rem); line-height: .95; margin: 10px 0 14px; }
+  .meta { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; color: var(--muted); font-size: .9rem; margin-bottom: 14px; }
+  .meta .match { color: var(--green); font-weight: 800; }
+  .meta .pill { border: 1px solid var(--muted); padding: 0 6px; border-radius: 3px; }
+  .hero p { font-size: 1.1rem; color: #ddd; margin-bottom: 22px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 24px; border-radius: 4px; font-weight: 800; font-size: 1rem; }
+  .btn-play { background: #fff; color: #000; }
+  .btn-info { background: #6d6d6eb3; color: #fff; }
+  .btn:hover { opacity: .85; }
+  .hero-art { position: absolute; right: 6%; top: 50%; transform: translateY(-50%); font-size: min(30vw, 340px); opacity: .18; user-select: none; }
+
+  /* ROWS */
+  section { padding: 28px 4%; }
+  .row-title { font-size: 1.9rem; margin-bottom: 4px; }
+  .row-sub { color: var(--muted); font-size: .9rem; margin-bottom: 14px; max-width: 760px; }
+  .carousel { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(220px, 260px); gap: 10px; overflow-x: auto; padding: 10px 0 24px; scroll-snap-type: x mandatory; scrollbar-width: thin; }
+  .card { scroll-snap-align: start; aspect-ratio: 16/9; border-radius: var(--radius); position: relative; overflow: hidden; text-align: left; color: #fff; padding: 14px; display: flex; flex-direction: column; justify-content: flex-end; transition: transform .25s, box-shadow .25s; }
+  .card:hover, .card:focus-visible { transform: scale(1.06); z-index: 3; box-shadow: 0 10px 30px #000a; outline: none; }
+  .card .num { position: absolute; top: 6px; left: 12px; font-family: "Bebas Neue"; font-size: 1rem; color: #fffc; letter-spacing: 2px; }
+  .card .ico { position: absolute; top: 10px; right: 12px; font-size: 2.2rem; }
+  .card h3 { font-size: 1.6rem; line-height: 1; }
+  .card small { color: #fffd; font-size: .78rem; }
+
+  /* EPISODES */
+  .episodes { display: grid; gap: 14px; max-width: 980px; }
+  .ep { display: grid; grid-template-columns: 40px 200px 1fr; gap: 16px; align-items: start; background: var(--bg-2); padding: 18px; border-radius: var(--radius); border-bottom: 1px solid #333; }
+  .ep .n { font-size: 2rem; color: var(--muted); font-family: "Bebas Neue"; }
+  .ep .thumb { aspect-ratio: 16/9; border-radius: 4px; display: grid; place-items: center; font-size: 3rem; position: relative; }
+  .ep .thumb::after { content: "▶"; position: absolute; font-size: 1.4rem; background: #000a; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; border: 2px solid #fff; }
+  .ep h3 { font-size: 1.6rem; display: flex; justify-content: space-between; gap: 10px; }
+  .ep h3 span { font-family: "Inter"; font-size: .9rem; color: var(--muted); }
+  .scenes { list-style: none; margin-top: 10px; display: grid; gap: 8px; }
+  .scenes li { background: var(--bg-3); border-radius: 4px; padding: 10px 12px; font-size: .92rem; }
+  .scenes li b { color: var(--red); font-size: .78rem; letter-spacing: 1px; display: block; }
+  .bar { height: 4px; background: #444; border-radius: 2px; margin-top: 6px; overflow: hidden; }
+  .bar i { display: block; height: 100%; background: var(--red); }
+  @media (max-width: 720px) { .ep { grid-template-columns: 1fr; } .ep .n { display: none; } }
+
+  /* KOLB */
+  .kolb { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; max-width: 1100px; counter-reset: k; }
+  .kstep { background: var(--bg-2); border-radius: var(--radius); padding: 18px; border-top: 4px solid var(--red); position: relative; }
+  .kstep::before { counter-increment: k; content: "0" counter(k); font-family: "Bebas Neue"; font-size: 2.6rem; color: #333; position: absolute; right: 12px; top: 4px; }
+  .kstep h3 { font-size: 1.5rem; }
+  .kstep p { color: var(--muted); font-size: .9rem; }
+  .kstep em { display: block; margin-top: 8px; font-style: normal; font-size: .82rem; color: #fff; background: var(--bg-3); padding: 6px 8px; border-radius: 4px; }
+  @media (max-width: 860px) { .kolb { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 480px) { .kolb { grid-template-columns: 1fr; } }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; max-width: 1100px; }
+  .chip { background: var(--bg-3); border: 1px solid #444; padding: 6px 12px; border-radius: 999px; font-size: .85rem; }
+
+  /* DUA settings */
+  .settings { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; max-width: 1100px; }
+  @media (max-width: 860px) { .settings { grid-template-columns: 1fr; } }
+  .panel { background: #000; border: 1px solid #333; border-radius: var(--radius); padding: 20px; }
+  .panel h3 { font-size: 1.5rem; margin-bottom: 10px; }
+  .barrier { border-left: 4px solid var(--yellow); padding: 8px 12px; margin-bottom: 12px; background: var(--bg-2); border-radius: 0 4px 4px 0; font-size: .92rem; }
+  .barrier b { color: var(--yellow); }
+  .tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+  .tab { background: var(--bg-3); color: var(--muted); padding: 8px 12px; border-radius: 4px; font-size: .85rem; font-weight: 600; }
+  .tab[aria-selected="true"] { background: #fff; color: #000; }
+  .tab-body { font-size: .95rem; color: #ddd; }
+  .tab-body .q { color: var(--muted); font-style: italic; margin-bottom: 8px; }
+  .tab-body ul { padding-left: 18px; display: grid; gap: 4px; margin-top: 8px; }
+  .analogy { margin-top: 12px; font-size: .82rem; color: var(--muted); border-top: 1px dashed #444; padding-top: 10px; }
+
+  /* INTERACTIVE */
+  .games { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: 1200px; }
+  @media (max-width: 960px) { .games { grid-template-columns: 1fr; } }
+  .game { background: var(--bg-2); border-radius: var(--radius); padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+  .game h3 { font-size: 1.5rem; }
+  .game .hint { color: var(--muted); font-size: .85rem; }
+  .light { display: flex; gap: 10px; }
+  .light button { flex: 1; padding: 12px 6px; border-radius: 6px; font-weight: 800; font-size: .8rem; color: #000; opacity: .55; transition: opacity .2s, transform .2s; }
+  .light button.on { opacity: 1; transform: translateY(-3px); box-shadow: 0 6px 18px #0008; }
+  .l-green { background: var(--green); } .l-yellow { background: var(--yellow); } .l-red { background: var(--red); color: #fff !important; }
+  .result { background: var(--bg-3); padding: 10px 12px; border-radius: 4px; font-size: .9rem; min-height: 46px; }
+  .statement { font-size: 1.15rem; font-weight: 600; min-height: 60px; }
+  .duo { display: flex; gap: 10px; }
+  .duo button { flex: 1; padding: 10px; border-radius: 4px; font-weight: 800; background: var(--bg-3); color: #fff; border: 1px solid #555; }
+  .duo button:hover { background: #3a3a3a; }
+  .score { color: var(--muted); font-size: .8rem; }
+  .ok { border-left: 4px solid var(--green); } .bad { border-left: 4px solid var(--red); }
+
+  /* COHERENCE CHAIN */
+  .chain { display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px; max-width: 1200px; }
+  .link { flex: 1 1 160px; background: var(--bg-2); border-radius: var(--radius); padding: 14px; position: relative; }
+  .link b { font-family: "Bebas Neue"; font-size: 1.3rem; color: var(--red); display: block; }
+  .link p { font-size: .85rem; color: #ddd; }
+
+  /* EVAL */
+  .eval { display: grid; grid-template-columns: 1.2fr 1fr; gap: 18px; max-width: 1100px; }
+  @media (max-width: 860px) { .eval { grid-template-columns: 1fr; } }
+  .timeline { list-style: none; border-left: 2px solid var(--red); padding-left: 18px; display: grid; gap: 14px; }
+  .timeline li { position: relative; font-size: .93rem; color: #ddd; }
+  .timeline li::before { content: ""; position: absolute; left: -25px; top: 6px; width: 12px; height: 12px; border-radius: 50%; background: var(--red); }
+  .timeline b { color: #fff; display: block; }
+  .criteria { list-style: none; display: grid; gap: 6px; }
+  .criteria li { background: var(--bg-2); padding: 8px 12px; border-radius: 4px; font-size: .88rem; display: flex; gap: 8px; }
+  .criteria li::before { content: "✔"; color: var(--green); }
+
+  /* MODAL */
+  dialog { margin: auto; width: min(820px, calc(100% - 32px)); max-height: 88vh; background: var(--bg-2); color: var(--text); border: 0; border-radius: 8px; padding: 0; overflow: auto; box-shadow: 0 20px 60px #000; }
+  dialog::backdrop { background: #000b; }
+  .m-head { padding: 40px 32px 20px; position: relative; }
+  .m-head h2 { font-size: clamp(2rem, 6vw, 3.2rem); line-height: 1; }
+  .m-head .meta { margin: 10px 0 0; }
+  .m-close { position: absolute; top: 14px; right: 14px; width: 36px; height: 36px; border-radius: 50%; background: #181818; color: #fff; font-size: 1.2rem; }
+  .m-body { padding: 0 32px 32px; color: #ddd; display: grid; gap: 12px; }
+  .m-body ul, .m-body ol { padding-left: 20px; display: grid; gap: 6px; }
+  .m-body .tip { background: #000; border-left: 4px solid var(--red); padding: 12px 14px; border-radius: 0 4px 4px 0; font-size: .9rem; }
+  .m-body .tip b { color: var(--red); }
+
+  /* PROFILE GATE */
+  .gate { position: fixed; inset: 0; z-index: 100; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px; padding: 24px 16px; text-align: center; transition: opacity .4s; overflow-y: auto; }
+  .gate.hidden { opacity: 0; pointer-events: none; }
+  .gate .logo { position: absolute; top: 18px; left: 4%; }
+  .gate h1 { font-family: "Inter"; font-weight: 600; font-size: clamp(1.8rem, 5vw, 3.2rem); }
+  .profiles { display: flex; flex-wrap: wrap; justify-content: center; gap: clamp(14px, 3vw, 32px); max-width: 900px; }
+  .profile { background: none; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 10px; width: clamp(110px, 16vw, 150px); font-size: .95rem; }
+  .profile .avatar { width: clamp(100px, 14vw, 140px); height: clamp(100px, 14vw, 140px); font-size: clamp(2.4rem, 5vw, 3.6rem); border-radius: 8px; border: 3px solid transparent; transition: border-color .2s, transform .2s; }
+  .profile:hover, .profile:focus-visible { color: #fff; outline: none; }
+  .profile:hover .avatar, .profile:focus-visible .avatar { border-color: #fff; transform: scale(1.05); }
+  .gate .sub { color: var(--muted); font-size: .9rem; max-width: 520px; }
+  .who { margin-left: auto; display: flex; align-items: center; gap: 10px; background: none; color: #fff; font-size: .85rem; }
+  .who .avatar { width: 34px; height: 34px; font-size: 1rem; border-radius: 4px; }
+  @media (max-width: 480px) { .who span:last-child { display: none; } }
+
+  footer { padding: 40px 4% 60px; color: var(--muted); font-size: .85rem; border-top: 1px solid #222; margin-top: 30px; }
+  footer h3 { color: #fff; font-size: 1.4rem; margin-bottom: 8px; }
+  .cast { display: flex; gap: 16px; flex-wrap: wrap; margin: 10px 0 20px; }
+  .cast div { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 110px; text-align: center; }
+  .avatar { width: 64px; height: 64px; border-radius: 6px; display: grid; place-items: center; font-family: "Bebas Neue"; font-size: 1.8rem; color: #fff; }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <span class="logo">PSICOFLIX</span>
+  <div class="nav-links">
+    <a href="#propuesta">La propuesta</a>
+    <a href="#episodios">Episodios</a>
+    <a href="#metodologia">Metodología</a>
+    <a href="#dua">DUA</a>
+    <a href="#interactivo">Modo interactivo</a>
+    <a href="#evaluacion">Evaluación</a>
+  </div>
+  <button class="who" id="who" aria-label="Cambiar perfil"></button>
+</nav>
+
+<div class="gate" id="gate">
+  <span class="logo">PSICOFLIX</span>
+  <h1>¿Quién está viendo?</h1>
+  <div class="profiles" id="profiles"></div>
+  <p class="sub">Didáctica I · Parcial integrador. Elegí tu perfil para entrar al taller.</p>
+</div>
+
+<header class="hero">
+  <div class="hero-art" aria-hidden="true">🤖</div>
+  <div class="hero-inner">
+    <span class="badge"><b>P</b> SERIE · TALLER PSICOPEDAGÓGICO</span>
+    <h1>¿La IA piensa por mí?</h1>
+    <div class="meta">
+      <span class="match">98% para vos</span>
+      <span>2026</span>
+      <span class="pill">3.º y 4.º año</span>
+      <span>2 episodios · 120 min</span>
+      <span class="pill">DUA</span>
+    </div>
+    <p>Estudiantes y profesoras se enfrentan a un nuevo desafío: el “copiar y pegar” automático. En este taller no se prohíbe la IA… se la pone bajo la lupa para volver a pensar por cuenta propia.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-play" data-open="ep1">▶ Reproducir</button>
+      <button class="btn btn-info" data-open="fundamentacion">ⓘ Más información</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section id="propuesta">
+    <h2 class="row-title">La propuesta, temporada completa</h2>
+    <p class="row-sub">Cada tarjeta es un componente de la planificación. Hacé clic para ver el detalle y el “tip de defensa oral”.</p>
+    <div class="carousel" id="row-proposal"></div>
+  </section>
+
+  <section id="episodios">
+    <h2 class="row-title">Episodios</h2>
+    <p class="row-sub">El taller dura dos encuentros de 60 minutos. Cada uno tiene la misma estructura: inicio, desarrollo y cierre.</p>
+    <div class="episodes" id="episodes"></div>
+  </section>
+
+  <section id="metodologia">
+    <h2 class="row-title">Detrás de escena: la metodología</h2>
+    <p class="row-sub">Modalidad <b>taller</b> basada en el <b>ciclo de Kolb</b>: se aprende a partir de la experiencia. El equipo coordina, pregunta y da ejemplos, pero no entrega todas las respuestas.</p>
+    <div class="kolb">
+      <div class="kstep"><h3>Experimentar</h3><p>Los participantes usan la IA con una tarea escolar real.</p><em>Ep. 1 · “¿La IA tiene razón?”</em></div>
+      <div class="kstep"><h3>Reflexionar</h3><p>Analizan qué pasó: ¿acertó?, ¿se equivocó?, ¿qué hice yo y qué hizo la IA?</p><em>Ep. 1 · “¿Ayuda o atajo?”</em></div>
+      <div class="kstep"><h3>Conceptualizar</h3><p>Entre todos construyen criterios para usarla correctamente.</p><em>Ep. 1 · Cierre: recomendaciones</em></div>
+      <div class="kstep"><h3>Aplicar</h3><p>Ponen en práctica los criterios: explicar con sus palabras y preguntar mejor.</p><em>Ep. 2 · Acuerdo común del aula</em></div>
+    </div>
+    <div class="chips">
+      <span class="chip">❓ Pregunta disparadora</span>
+      <span class="chip">🖥️ Demostración en vivo de la IA</span>
+      <span class="chip">🗣️ Pensar en voz alta</span>
+      <span class="chip">📋 Análisis de situaciones</span>
+      <span class="chip">🔄 Grupos con roles rotativos</span>
+      <span class="chip">🧩 Estaciones de trabajo</span>
+      <span class="chip">💬 Debate</span>
+      <span class="chip">🔁 Devoluciones durante el proceso</span>
+      <span class="chip">🏁 Cierre metacognitivo</span>
+    </div>
+  </section>
+
+  <section id="dua">
+    <h2 class="row-title">Audio, subtítulos y accesibilidad: el DUA</h2>
+    <p class="row-sub">Así como una plataforma te deja elegir idioma, subtítulos y velocidad para que nadie quede afuera, el Diseño Universal para el Aprendizaje anticipa barreras y ofrece varias formas de acceder al taller.</p>
+    <div class="settings">
+      <div class="panel">
+        <h3>⚠️ Barreras detectadas</h3>
+        <div class="barrier"><b>1 · Cognitiva / actitudinal.</b> La costumbre de resolver todo rápido con “copiar y pegar” puede generar frustración o resistencia frente a consignas que piden pensar y elaborar.</div>
+        <div class="barrier"><b>2 · Comunicacional.</b> Trabajar solo con textos escritos largos dificulta la participación de quienes procesan mejor la información de forma visual o auditiva.</div>
+        <p class="analogy">Barrera = algo del entorno o de la propuesta que impide aprender o participar. No está “en el alumno”: está en el diseño, y por eso se puede rediseñar.</p>
+      </div>
+      <div class="panel">
+        <h3>⚙️ Configuración del taller</h3>
+        <div class="tabs" role="tablist" id="dua-tabs"></div>
+        <div class="tab-body" id="dua-body" role="tabpanel"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="interactivo">
+    <h2 class="row-title">Modo interactivo: vos elegís</h2>
+    <p class="row-sub">Las tres dinámicas del taller, listas para probar en la defensa o en el aula.</p>
+    <div class="games">
+      <div class="game">
+        <h3>🚦 El semáforo</h3>
+        <p class="hint">¿Para qué usás la IA en la escuela? Elegí tu color.</p>
+        <div class="light">
+          <button class="l-green" data-light="green">VERDE</button>
+          <button class="l-yellow" data-light="yellow">AMARILLO</button>
+          <button class="l-red" data-light="red">ROJO</button>
+        </div>
+        <div class="result" id="light-result">Tocá un color para ver qué significa.</div>
+      </div>
+
+      <div class="game">
+        <h3>✅ ¿Verdadero o falso?</h3>
+        <p class="hint">Inicio del episodio 2.</p>
+        <div class="statement" id="tf-statement"></div>
+        <div class="duo">
+          <button data-tf="true">Verdadero</button>
+          <button data-tf="false">Falso</button>
+        </div>
+        <div class="result" id="tf-result">Respondé para ver la explicación.</div>
+        <span class="score" id="tf-score"></span>
+      </div>
+
+      <div class="game">
+        <h3>🧭 ¿Ayuda o atajo?</h3>
+        <p class="hint">Episodio 1, actividad 2. ¿Esta situación ayuda a aprender o es copiar sin entender?</p>
+        <div class="statement" id="aa-statement"></div>
+        <div class="duo">
+          <button data-aa="ayuda">💡 Ayuda</button>
+          <button data-aa="atajo">✂️ Atajo</button>
+        </div>
+        <div class="result" id="aa-result">Elegí una opción.</div>
+        <span class="score" id="aa-score"></span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="row-title">Todo está conectado</h2>
+    <p class="row-sub">El criterio central de la evaluación: coherencia entre problemática, objetivos, estrategias, actividades y evaluación. Así se encadena la propuesta.</p>
+    <div class="chain">
+      <div class="link"><b>Problemática</b><p>Uso automático de la IA: copiar y pegar, inmediatez, poco procesamiento profundo.</p></div>
+      <div class="link"><b>Objetivo</b><p>Construir colaborativamente un uso crítico y reflexivo de la IA.</p></div>
+      <div class="link"><b>Estrategias</b><p>Pensar en voz alta, demostración, roles, debate.</p></div>
+      <div class="link"><b>Actividades</b><p>Semáforo, ¿la IA tiene razón?, explicar con mis palabras, preguntar mejor.</p></div>
+      <div class="link"><b>Evaluación</b><p>¿Verifican, reconocen errores y elaboran respuestas propias?</p></div>
+    </div>
+  </section>
+
+  <section id="evaluacion">
+    <h2 class="row-title">Evaluación: ¿cómo sabemos que funcionó?</h2>
+    <p class="row-sub">Evaluación procesual: se mira durante todo el taller, al final y también después.</p>
+    <div class="eval">
+      <ol class="timeline">
+        <li><b>Durante el taller</b>Participación, trabajo en grupo y cómo aprenden a usar la IA con responsabilidad: ¿reconocen errores, verifican la información, elaboran respuestas propias?</li>
+        <li><b>Al cierre</b>Producción final de cada grupo: el acuerdo sobre el uso de la IA en la escuela, y la reflexión de cada participante sobre lo aprendido.</li>
+        <li><b>Evaluación de la propuesta</b>Opiniones de estudiantes y profesoras sobre cómo funcionó el taller.</li>
+        <li><b>Trimestre siguiente</b>Seguimiento: ¿las consignas reformuladas se siguen usando en las materias? ¿favorecen más participación y reflexión?</li>
+      </ol>
+      <div>
+        <h3 style="font-size:1.4rem;margin-bottom:8px">Criterios del parcial</h3>
+        <ul class="criteria">
+          <li>Integración conceptual de las unidades</li>
+          <li>Coherencia entre problemática, objetivos, estrategias, actividades y evaluación</li>
+          <li>Pertinencia de la metodología</li>
+          <li>Incorporación concreta del DUA, barreras y apoyos</li>
+          <li>Fundamentación psicopedagógica</li>
+          <li>Creatividad y viabilidad</li>
+          <li>Capacidad de análisis y reflexión</li>
+          <li>Claridad en la defensa oral</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <h3>Elenco</h3>
+  <div class="cast" id="cast"></div>
+  <p>Didáctica I · Psicopedagogía · Parcial integrador grupal.</p>
+</footer>
+
+<dialog id="modal" aria-labelledby="m-title">
+  <div class="m-head" id="m-head">
+    <button class="m-close" aria-label="Cerrar" id="m-close">✕</button>
+    <h2 id="m-title"></h2>
+    <div class="meta" id="m-meta"></div>
+  </div>
+  <div class="m-body" id="m-body"></div>
+</dialog>
+
+<script>
+const GRADIENTS = [
+  "linear-gradient(135deg,#e50914,#5c0a0e)", "linear-gradient(135deg,#4b1fa8,#120530)",
+  "linear-gradient(135deg,#0f7b6c,#03241f)", "linear-gradient(135deg,#d97706,#3a1d02)",
+  "linear-gradient(135deg,#2563eb,#0a1a40)", "linear-gradient(135deg,#be185d,#3b0820)",
+  "linear-gradient(135deg,#4d7c0f,#14200a)", "linear-gradient(135deg,#475569,#0f172a)"
+];
+
+// Each entry = one component of the planning document.
+const SECTIONS = {
+  problematica: {
+    icon: "🧩", title: "Problemática", sub: "El conflicto de la serie",
+    meta: ["Necesidad", "Nivel secundario"],
+    body: `<p>Dificultades en la <b>comprensión lectora</b>, el <b>pensamiento crítico</b> y la <b>autonomía del aprendizaje</b> en estudiantes de secundaria a raíz del uso de herramientas de IA.</p>
+      <ul><li>“Copiar y pegar” automático.</li><li>Búsqueda de inmediatez.</li><li>Pérdida de procesamiento cognitivo profundo.</li></ul>
+      <p>Además, es un desafío para las prácticas de enseñanza y mediación docente.</p>`,
+    tip: "La problemática no es “la IA”, sino el <i>uso automático</i> de la IA. Esa distinción justifica todo lo demás."
+  },
+  destinatarios: {
+    icon: "👥", title: "Destinatarios", sub: "Quiénes protagonizan",
+    meta: ["30 a 35 participantes"],
+    body: `<p>Estudiantes de <b>3.º y 4.º año</b> del nivel secundario junto con <b>profesoras y docentes</b> de la institución.</p>`,
+    tip: "Incluir a las docentes no es un detalle: el objetivo 3 propone reformular consignas reales <i>entre</i> estudiantes y profesoras."
+  },
+  contexto: {
+    icon: "🏫", title: "Contexto", sub: "Dónde se filma",
+    meta: ["Ámbito educativo"],
+    body: `<p>Taller en el <b>aula de informática</b> o la <b>biblioteca</b> de la escuela.</p>`,
+    tip: "El espacio elegido garantiza acceso a computadoras e internet, condición necesaria para trabajar con la IA en vivo."
+  },
+  fundamentacion: {
+    icon: "📚", title: "Fundamentación", sub: "Por qué existe esta serie",
+    meta: ["Litwin", "Davini", "Anijovich"],
+    body: `<p>La IA forma parte de la vida cotidiana de los jóvenes y plantea nuevos retos para la enseñanza y para los procesos cognitivos superiores.</p>
+      <ul>
+        <li><b>Edith Litwin (2008) y María Cristina Davini (2008):</b> la intervención no debe prohibir ni aislar, sino abrir espacios donde estudiantes y profesoras reflexionen juntos. El sujeto aprende participando con otros: <i>aprender haciendo</i>.</li>
+        <li><b>Rebeca Anijovich (2014):</b> el desafío es revalorizar la lectura reflexiva, la evaluación crítica de fuentes, la adecuación de consignas y los recursos metacognitivos.</li>
+      </ul>
+      <p>La IA deja de ser un <b>reemplazo del pensamiento</b> y pasa a ser un <b>objeto de análisis crítico compartido</b>.</p>`,
+    tip: "Frase clave para defender: “No estamos en contra de la tecnología; la convertimos en objeto de análisis”."
+  },
+  objetivos: {
+    icon: "🎯", title: "Objetivos", sub: "La misión",
+    meta: ["1 general", "3 específicos"],
+    body: `<p><b>General:</b> construir colaborativamente estrategias de uso crítico y reflexivo de la IA que fortalezcan la autonomía de los estudiantes y la mediación de los profesores.</p>
+      <ol>
+        <li><b>Identificar</b>, entre estudiantes y docentes, alcances, límites y riesgos del uso automático de la IA.</li>
+        <li><b>Aplicar</b> estrategias de lectura comprensiva para comparar un texto de estudio con lo que responde la IA.</li>
+        <li><b>Reformular</b> consignas reales de las materias para que no se resuelvan solo copiando de la IA.</li>
+      </ol>`,
+    tip: "Los verbos van en orden creciente de complejidad: identificar → aplicar → reformular."
+  },
+  contenidos: {
+    icon: "📝", title: "Contenidos", sub: "El guion",
+    meta: ["5 ejes"],
+    body: `<ol>
+        <li>Qué es la IA, cómo arma sus respuestas, para qué sirve y en qué se equivoca.</li>
+        <li>Lectura comprensiva: anticipar y buscar ideas principales.</li>
+        <li>Comparar información: ¿es confiable?, ¿está actualizada?</li>
+        <li>Copiar vs. usar la IA como ayuda vs. crear una respuesta propia. Metacognición: <i>¿qué pensé yo y qué hizo la IA?</i></li>
+        <li>Ideas para que los docentes propongan consignas que inviten a pensar.</li>
+      </ol>`,
+    tip: "El contenido 4 es metacognición pura: reflexionar sobre el propio proceso de aprender."
+  },
+  recursos: {
+    icon: "🎒", title: "Recursos", sub: "La producción",
+    meta: ["Humanos", "Materiales", "Tecnológicos"],
+    body: `<ul>
+        <li><b>Humanos:</b> equipo psicopedagógico, profesoras, bibliotecaria y referente TIC.</li>
+        <li><b>Materiales:</b> textos de distintas materias, fichas con situaciones, afiches, fibrones, tarjetas.</li>
+        <li><b>Tecnológicos:</b> computadoras, proyector, celulares, internet, una IA gratuita, audios de los textos y apps para hacer videos.</li>
+      </ul>`,
+    tip: "La variedad de recursos no es decorativa: sostiene las múltiples formas de representación del DUA."
+  },
+  temporalizacion: {
+    icon: "⏱️", title: "Temporalización", sub: "Duración",
+    meta: ["2 × 60 min", "120 min totales"],
+    body: `<p>Dos encuentros de 60 minutos, cada uno con <b>inicio (15')</b>, <b>desarrollo (30')</b> y <b>cierre (15')</b>.</p>`,
+    tip: "La estructura repetida da previsibilidad, algo que también reduce barreras."
+  }
+};
+
+const EPISODES = [
+  {
+    id: "ep1", icon: "🤔", title: "¿La IA piensa por mí?", gradient: GRADIENTS[0],
+    synopsis: "Primer contacto: ¿para qué usamos la IA y cuándo nos engaña?",
+    scenes: [
+      ["INICIO · 15'", "Semáforo: cada estudiante escribe para qué usa la IA y lo ubica en verde, amarillo o rojo. Se comparten respuestas.", 25],
+      ["DESARROLLO · 15'", "¿La IA tiene razón? Se proyecta una respuesta de la IA sobre un tema escolar y se verifica entre todos.", 50],
+      ["DESARROLLO · 15'", "¿Ayuda o atajo? En grupos, clasifican situaciones: ¿ayudan a aprender o son copiar sin entender?", 75],
+      ["CIERRE · 15'", "Recomendaciones colectivas para usar la IA responsablemente. Cada uno comparte algo que aprendió.", 100]
+    ]
+  },
+  {
+    id: "ep2", icon: "🤝", title: "Aprendemos a usar la IA con responsabilidad", gradient: GRADIENTS[1],
+    synopsis: "De la reflexión a la práctica: explicar, preguntar mejor y acordar reglas.",
+    scenes: [
+      ["INICIO · 15'", "Juego de verdadero o falso: “La IA siempre dice la verdad”, “La IA puede ayudarme a entender un tema”.", 25],
+      ["DESARROLLO · 10'", "Explicá con tus palabras: leen una respuesta de la IA y se la explican a un compañero.", 42],
+      ["DESARROLLO · 15'", "¿Cómo preguntar mejor? Comparan una pregunta que solo pide información con otra que invita a pensar. Crean la suya.", 75],
+      ["CIERRE · 15'", "Cada grupo propone dos reglas y arman un acuerdo común para el aula.", 100]
+    ]
+  }
+];
+
+const DUA = [
+  {
+    tab: "🔥 Implicación", q: "¿Cómo favorece motivación, elección y participación?",
+    items: ["Tema cercano: la IA es parte de su día a día.", "Semáforo para opinar libremente, sin sentirse juzgados.", "Cada estudiante elige su rol en el grupo: coordinar, anotar, exponer.", "Respeto por los ritmos propios y colaboración."],
+    analogy: "Como el “porque viste…”: se parte de lo que ya les interesa."
+  },
+  {
+    tab: "👁️ Representación", q: "¿De qué maneras se presenta la información?",
+    items: ["Textos en papel, pero no solo eso.", "Pantallas y proyecciones.", "Afiches visuales.", "Audios de los textos.", "“Pensar en voz alta” para modelar cómo se analiza un texto."],
+    analogy: "Como elegir audio, subtítulos o doblaje: el mismo contenido, distintas puertas de entrada."
+  },
+  {
+    tab: "✋ Acción y expresión", q: "¿Qué alternativas tienen para producir y expresar lo aprendido?",
+    items: ["Explicar las ideas con sus palabras a un compañero.", "Armar esquemas en afiches.", "Grabar un audio corto.", "Participar en la producción del acuerdo grupal."],
+    analogy: "Como poder ver en TV, celular o compu: cada quien muestra lo aprendido por el canal que mejor le funciona."
+  }
+];
+
+const LIGHTS = {
+  green: "🟢 <b>Verde:</b> la IA me ayuda a aprender.",
+  yellow: "🟡 <b>Amarillo:</b> depende de cómo la use.",
+  red: "🔴 <b>Rojo:</b> la IA hace la tarea por mí y no entiendo."
+};
+
+const TRUE_FALSE = [
+  ["La IA siempre dice la verdad.", false, "Puede inventar datos o equivocarse con seguridad. Por eso hay que comparar con otras fuentes."],
+  ["La IA puede ayudarme a entender un tema.", true, "Sí, si la uso para pedir explicaciones o ejemplos y después lo pongo en mis palabras."],
+  ["Si la IA lo dijo, no hace falta revisar el libro.", false, "Comparar con el texto de estudio es justamente una de las estrategias del taller."],
+  ["Cómo pregunto cambia lo que aprendo.", true, "Una pregunta que invita a relacionar y razonar me hace pensar más que una que solo pide un dato."]
+];
+
+const HELP_OR_SHORTCUT = [
+  ["Copio la respuesta de la IA y la entrego tal cual.", "atajo", "No hay elaboración propia: la IA pensó por mí."],
+  ["Le pido que me explique un concepto con un ejemplo y después lo explico con mis palabras.", "ayuda", "Uso la IA como apoyo y luego proceso la información yo."],
+  ["Comparo lo que dice la IA con el libro para ver si coincide.", "ayuda", "Verifico la fuente: lectura crítica en acción."],
+  ["Le pido un resumen del texto para no tener que leerlo.", "atajo", "Me salteo la lectura comprensiva; no sé si el resumen es correcto."],
+  ["Le pregunto cómo se relaciona el tema con mi vida cotidiana.", "ayuda", "Es una pregunta que invita a pensar y relacionar."]
+];
+
+const CAST = ["Laura Carmona", "Laura Carolina Liendro Sánchez", "Gabriela Luna", "Ailen Vega"];
+
+// ---------- Render ----------
+const $ = (s) => document.querySelector(s);
+
+$("#row-proposal").innerHTML = Object.entries(SECTIONS).map(([key, s], i) => `
+  <button class="card" style="background:${GRADIENTS[i % GRADIENTS.length]}" data-open="${key}">
+    <span class="num">${String(i + 1).padStart(2, "0")}</span>
+    <span class="ico" aria-hidden="true">${s.icon}</span>
+    <h3>${s.title}</h3><small>${s.sub}</small>
+  </button>`).join("");
+
+$("#episodes").innerHTML = EPISODES.map((ep, i) => `
+  <article class="ep">
+    <span class="n">${i + 1}</span>
+    <button class="thumb" style="background:${ep.gradient}" data-open="${ep.id}" aria-label="Ver ${ep.title}">${ep.icon}</button>
+    <div>
+      <h3>${ep.title}<span>60 min</span></h3>
+      <p style="color:var(--muted);font-size:.9rem">${ep.synopsis}</p>
+      <ul class="scenes">${ep.scenes.map(([t, d, p]) => `<li><b>${t}</b>${d}<div class="bar"><i style="width:${p}%"></i></div></li>`).join("")}</ul>
+    </div>
+  </article>`).join("");
+
+$("#cast").innerHTML = CAST.map((name, i) => `
+  <div><span class="avatar" style="background:${GRADIENTS[i]}">${name.split(" ").map(w => w[0]).slice(0, 2).join("")}</span><span>${name}</span></div>`).join("");
+
+// ---------- Profile gate ----------
+const initials = (name) => name.split(" ").map(w => w[0]).slice(0, 2).join("");
+$("#profiles").innerHTML = CAST.map((name, i) => `
+  <button class="profile" data-profile="${i}">
+    <span class="avatar" style="background:${GRADIENTS[i]}">${initials(name)}</span>
+    <span>${name}</span>
+  </button>`).join("");
+$("#profiles").addEventListener("click", (e) => {
+  const p = e.target.closest("[data-profile]");
+  if (!p) return;
+  const i = +p.dataset.profile;
+  $("#who").innerHTML = `<span>Hola, ${CAST[i].split(" ")[0]}</span><span class="avatar" style="background:${GRADIENTS[i]}">${initials(CAST[i])}</span>`;
+  $("#gate").classList.add("hidden");
+  document.body.style.overflow = "";
+  scrollTo(0, 0);
+});
+$("#who").onclick = () => { $("#gate").classList.remove("hidden"); document.body.style.overflow = "hidden"; };
+document.body.style.overflow = "hidden";
+
+// ---------- Modal ----------
+const modal = $("#modal");
+function openModal(key) {
+  const ep = EPISODES.find(e => e.id === key);
+  if (ep) {
+    $("#m-head").style.background = `linear-gradient(to top, var(--bg-2), transparent), ${ep.gradient}`;
+    $("#m-title").textContent = ep.title;
+    $("#m-meta").innerHTML = `<span class="match">Episodio ${EPISODES.indexOf(ep) + 1}</span><span>60 min</span>`;
+    $("#m-body").innerHTML = `<p>${ep.synopsis}</p><ol>${ep.scenes.map(([t, d]) => `<li><b>${t}</b> — ${d}</li>`).join("")}</ol>`;
+  } else {
+    const s = SECTIONS[key];
+    const i = Object.keys(SECTIONS).indexOf(key);
+    $("#m-head").style.background = `linear-gradient(to top, var(--bg-2), transparent), ${GRADIENTS[i % GRADIENTS.length]}`;
+    $("#m-title").textContent = `${s.icon} ${s.title}`;
+    $("#m-meta").innerHTML = s.meta.map(m => `<span class="pill">${m}</span>`).join("");
+    $("#m-body").innerHTML = s.body + `<div class="tip"><b>🎤 Tip para la defensa oral:</b> ${s.tip}</div>`;
+  }
+  modal.showModal();
+}
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-open]");
+  if (btn) openModal(btn.dataset.open);
+});
+$("#m-close").onclick = () => modal.close();
+modal.addEventListener("click", (e) => { if (e.target === modal) modal.close(); });
+
+// ---------- DUA tabs ----------
+function renderDua(idx) {
+  $("#dua-tabs").innerHTML = DUA.map((d, i) => `<button class="tab" role="tab" aria-selected="${i === idx}" data-dua="${i}">${d.tab}</button>`).join("");
+  const d = DUA[idx];
+  $("#dua-body").innerHTML = `<p class="q">${d.q}</p><ul>${d.items.map(x => `<li>${x}</li>`).join("")}</ul><p class="analogy">📺 ${d.analogy}</p>`;
+}
+$("#dua-tabs").addEventListener("click", (e) => { const t = e.target.closest("[data-dua]"); if (t) renderDua(+t.dataset.dua); });
+renderDua(0);
+
+// ---------- Semáforo ----------
+document.querySelectorAll("[data-light]").forEach(b => b.onclick = () => {
+  document.querySelectorAll("[data-light]").forEach(x => x.classList.toggle("on", x === b));
+  $("#light-result").innerHTML = LIGHTS[b.dataset.light] + "<br><small style='color:var(--muted)'>En el taller, las respuestas se comparten para conversar sobre los distintos usos.</small>";
+});
+
+// ---------- Quiz helper ----------
+function quiz({ items, statementEl, resultEl, scoreEl, attr, isCorrect }) {
+  let i = 0, ok = 0, answered = false;
+  const show = () => {
+    answered = false;
+    $(statementEl).textContent = `“${items[i][0]}”`;
+    $(resultEl).className = "result";
+    $(resultEl).textContent = "Elegí una opción.";
+    $(scoreEl).textContent = `${i + 1} de ${items.length} · aciertos: ${ok}`;
+  };
+  document.querySelectorAll(`[data-${attr}]`).forEach(b => b.onclick = () => {
+    if (answered) { i = (i + 1) % items.length; if (i === 0) ok = 0; show(); return; }
+    answered = true;
+    const good = isCorrect(b.dataset[attr], items[i]);
+    if (good) ok++;
+    $(resultEl).className = "result " + (good ? "ok" : "bad");
+    $(resultEl).innerHTML = `${good ? "✅ ¡Bien!" : "❌ No exactamente."} ${items[i][2]}<br><small style="color:var(--muted)">Tocá cualquier botón para seguir.</small>`;
+    $(scoreEl).textContent = `${i + 1} de ${items.length} · aciertos: ${ok}`;
+  });
+  show();
+}
+quiz({ items: TRUE_FALSE, statementEl: "#tf-statement", resultEl: "#tf-result", scoreEl: "#tf-score", attr: "tf",
+  isCorrect: (v, item) => (v === "true") === item[1] });
+quiz({ items: HELP_OR_SHORTCUT, statementEl: "#aa-statement", resultEl: "#aa-result", scoreEl: "#aa-score", attr: "aa",
+  isCorrect: (v, item) => v === item[1] });
+
+// ---------- Nav background on scroll ----------
+addEventListener("scroll", () => $("#nav").classList.toggle("solid", scrollY > 60));
+</script>
+</body>
+</html>
