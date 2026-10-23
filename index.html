@@ -118,7 +118,7 @@
 
   /* INTERACTIVE */
   .games { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; max-width: 900px; }
-  #semaforo .games { grid-template-columns: 1fr; max-width: 520px; }
+  #interactivo .games { grid-template-columns: 1fr; max-width: 520px; }
   @media (max-width: 960px) { .games { grid-template-columns: 1fr; } }
   .game { background: var(--bg-2); border-radius: var(--radius); padding: 20px; display: flex; flex-direction: column; gap: 12px; }
   .game h3 { font-size: 1.5rem; }
@@ -288,8 +288,48 @@
 
   <section id="interactivo">
     <h2 class="row-title">Modo interactivo: vos elegís</h2>
-    <p class="row-sub">Dos dinámicas del taller, listas para probar en la defensa o en el aula.</p>
+    <p class="row-sub">Una dinámica del taller, lista para probar en la defensa o en el aula.</p>
     <div class="games">
+      <div class="game">
+        <h3>🧭 ¿Ayuda o atajo?</h3>
+        <p class="hint">Episodio 1, actividad 2. ¿Esta situación ayuda a aprender o es copiar sin entender?</p>
+        <div class="statement" id="aa-statement"></div>
+        <div class="duo">
+          <button data-aa="ayuda">💡 Ayuda</button>
+          <button data-aa="atajo">✂️ Atajo</button>
+        </div>
+        <div class="result" id="aa-result">Elegí una opción.</div>
+        <span class="score" id="aa-score"></span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="row-title">Todo está conectado</h2>
+    <p class="row-sub">El criterio central de la evaluación: coherencia entre problemática, objetivos, estrategias, actividades y evaluación. Así se encadena la propuesta.</p>
+    <div class="chain">
+      <div class="link"><b>Problemática</b><p>Uso automático de la IA: copiar y pegar, inmediatez, poco procesamiento profundo.</p></div>
+      <div class="link"><b>Objetivo</b><p>Construir colaborativamente un uso crítico y reflexivo de la IA.</p></div>
+      <div class="link"><b>Estrategias</b><p>Pensar en voz alta, demostración, roles, debate.</p></div>
+      <div class="link"><b>Actividades</b><p>Semáforo, ¿la IA tiene razón?, explicar con mis palabras, preguntar mejor.</p></div>
+      <div class="link"><b>Evaluación</b><p>¿Verifican, reconocen errores y elaboran respuestas propias?</p></div>
+    </div>
+  </section>
+
+  <section id="semaforo">
+    <h2 class="row-title">El semáforo y ¿verdadero o falso?</h2>
+    <p class="row-sub">Las dinámicas de inicio de cada episodio.</p>
+    <div class="games">
+      <div class="game">
+        <h3>🚦 El semáforo</h3>
+        <p class="hint">Inicio del episodio 1: ¿para qué usás la IA en la escuela? Elegí tu color.</p>
+        <div class="light">
+          <button class="l-green" data-light="green">VERDE</button>
+          <button class="l-yellow" data-light="yellow">AMARILLO</button>
+          <button class="l-red" data-light="red">ROJO</button>
+        </div>
+        <div class="result" id="light-result">Tocá un color para ver qué significa.</div>
+      </div>
 
       <div class="game">
         <h3>✅ ¿Verdadero o falso?</h3>
@@ -301,18 +341,6 @@
         </div>
         <div class="result" id="tf-result">Respondé para ver la explicación.</div>
         <span class="score" id="tf-score"></span>
-      </div>
-
-      <div class="game">
-        <h3>🧭 ¿Ayuda o atajo?</h3>
-        <p class="hint">Episodio 1, actividad 2. ¿Esta situación ayuda a aprender o es copiar sin entender?</p>
-        <div class="statement" id="aa-statement"></div>
-        <div class="duo">
-          <button data-aa="ayuda">💡 Ayuda</button>
-          <button data-aa="atajo">✂️ Atajo</button>
-        </div>
-        <div class="result" id="aa-result">Elegí una opción.</div>
-        <span class="score" id="aa-score"></span>
       </div>
     </div>
   </section>
@@ -331,33 +359,6 @@
         <h3>⚙️ Configuración del taller</h3>
         <div class="tabs" role="tablist" id="dua-tabs"></div>
         <div class="tab-body" id="dua-body" role="tabpanel"></div>
-      </div>
-    </div>
-  </section>
-
-  <section>
-    <h2 class="row-title">Todo está conectado</h2>
-    <p class="row-sub">El criterio central de la evaluación: coherencia entre problemática, objetivos, estrategias, actividades y evaluación. Así se encadena la propuesta.</p>
-    <div class="chain">
-      <div class="link"><b>Problemática</b><p>Uso automático de la IA: copiar y pegar, inmediatez, poco procesamiento profundo.</p></div>
-      <div class="link"><b>Objetivo</b><p>Construir colaborativamente un uso crítico y reflexivo de la IA.</p></div>
-      <div class="link"><b>Estrategias</b><p>Pensar en voz alta, demostración, roles, debate.</p></div>
-      <div class="link"><b>Actividades</b><p>Semáforo, ¿la IA tiene razón?, explicar con mis palabras, preguntar mejor.</p></div>
-      <div class="link"><b>Evaluación</b><p>¿Verifican, reconocen errores y elaboran respuestas propias?</p></div>
-    </div>
-  </section>
-
-  <section id="semaforo">
-    <h2 class="row-title">🚦 El semáforo</h2>
-    <p class="row-sub">Inicio del episodio 1: ¿para qué usás la IA en la escuela? Elegí tu color.</p>
-    <div class="games">
-      <div class="game">
-        <div class="light">
-          <button class="l-green" data-light="green">VERDE</button>
-          <button class="l-yellow" data-light="yellow">AMARILLO</button>
-          <button class="l-red" data-light="red">ROJO</button>
-        </div>
-        <div class="result" id="light-result">Tocá un color para ver qué significa.</div>
       </div>
     </div>
   </section>
