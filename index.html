@@ -117,7 +117,8 @@
   .analogy { margin-top: 12px; font-size: .82rem; color: var(--muted); border-top: 1px dashed #444; padding-top: 10px; }
 
   /* INTERACTIVE */
-  .games { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: 1200px; }
+  .games { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; max-width: 900px; }
+  #semaforo .games { grid-template-columns: 1fr; max-width: 520px; }
   @media (max-width: 960px) { .games { grid-template-columns: 1fr; } }
   .game { background: var(--bg-2); border-radius: var(--radius); padding: 20px; display: flex; flex-direction: column; gap: 12px; }
   .game h3 { font-size: 1.5rem; }
@@ -287,18 +288,8 @@
 
   <section id="interactivo">
     <h2 class="row-title">Modo interactivo: vos elegís</h2>
-    <p class="row-sub">Las tres dinámicas del taller, listas para probar en la defensa o en el aula.</p>
+    <p class="row-sub">Dos dinámicas del taller, listas para probar en la defensa o en el aula.</p>
     <div class="games">
-      <div class="game">
-        <h3>🚦 El semáforo</h3>
-        <p class="hint">¿Para qué usás la IA en la escuela? Elegí tu color.</p>
-        <div class="light">
-          <button class="l-green" data-light="green">VERDE</button>
-          <button class="l-yellow" data-light="yellow">AMARILLO</button>
-          <button class="l-red" data-light="red">ROJO</button>
-        </div>
-        <div class="result" id="light-result">Tocá un color para ver qué significa.</div>
-      </div>
 
       <div class="game">
         <h3>✅ ¿Verdadero o falso?</h3>
@@ -353,6 +344,21 @@
       <div class="link"><b>Estrategias</b><p>Pensar en voz alta, demostración, roles, debate.</p></div>
       <div class="link"><b>Actividades</b><p>Semáforo, ¿la IA tiene razón?, explicar con mis palabras, preguntar mejor.</p></div>
       <div class="link"><b>Evaluación</b><p>¿Verifican, reconocen errores y elaboran respuestas propias?</p></div>
+    </div>
+  </section>
+
+  <section id="semaforo">
+    <h2 class="row-title">🚦 El semáforo</h2>
+    <p class="row-sub">Inicio del episodio 1: ¿para qué usás la IA en la escuela? Elegí tu color.</p>
+    <div class="games">
+      <div class="game">
+        <div class="light">
+          <button class="l-green" data-light="green">VERDE</button>
+          <button class="l-yellow" data-light="yellow">AMARILLO</button>
+          <button class="l-red" data-light="red">ROJO</button>
+        </div>
+        <div class="result" id="light-result">Tocá un color para ver qué significa.</div>
+      </div>
     </div>
   </section>
 
